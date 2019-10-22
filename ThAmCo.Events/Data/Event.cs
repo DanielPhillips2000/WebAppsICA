@@ -11,6 +11,7 @@ namespace ThAmCo.Events.Data
         [Required]
         public string Title { get; set; }
 
+        [Required]
         public DateTime Date { get; set; }
 
         public TimeSpan? Duration { get; set; }
