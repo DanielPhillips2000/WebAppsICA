@@ -7,8 +7,10 @@
 <h2>Index</h2>
 
 <p>
-    <a asp-action="Create">Create New</a>
-</p>
+    <a asp-action="Create">Create New</a> <br>
+    <label for="NumberOfRecords">Number Of Records </label> @Model.Count()
+    
+
 <table class="table">
     <thead>
         <tr>
@@ -45,3 +47,5 @@
 }
     </tbody>
 </table>
+
+@*<p><label for="NumberOfAttenders">Attending</label> @Model.Count(item.Attended)</p>*@
