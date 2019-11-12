@@ -46,9 +46,9 @@ namespace ThAmCo.Events.Controllers
         }
 
         // GET: GuestBookings/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? customerId, int? eventId)
         {
-            if (id == null)
+            if (customerId == null || eventId == null)
             {
                 return NotFound();
             }
@@ -56,7 +56,7 @@ namespace ThAmCo.Events.Controllers
             var guestBooking = await _context.Guests
                 .Include(g => g.Customer)
                 .Include(g => g.Event)
-                .FirstOrDefaultAsync(m => m.CustomerId == id);
+                .FirstOrDefaultAsync(m => m.CustomerId == customerId);
             if (guestBooking == null)
             {
                 return NotFound();
@@ -94,7 +94,7 @@ namespace ThAmCo.Events.Controllers
         // GET: GuestBookings/Edit/5
         public async Task<IActionResult> Edit(int? customerId, int? eventId)
         {
-            if (customerId == null)
+            if (customerId == null || eventId == null)
             {
                 return NotFound();
             }
@@ -149,7 +149,7 @@ namespace ThAmCo.Events.Controllers
         // GET: GuestBookings/Delete/5
         public async Task<IActionResult> Delete(int? customerId, int? eventId)
         {
-            if (customerId == null)
+            if (customerId == null, eventId == null)
             {
                 return NotFound();
             }
