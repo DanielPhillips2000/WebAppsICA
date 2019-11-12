@@ -8,7 +8,7 @@
 
 <p>
     <a asp-action="Create">Create New</a> <br>
-    <label for="NumberOfRecords">Number Of Records </label> @Model.Count()
+    <label for="NumberOfRecords">Number Of Guests </label> @Model.Count()
     
 
 <table class="table">
@@ -39,9 +39,9 @@
                 @Html.DisplayFor(modelItem => item.Attended)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                @Html.ActionLink("Edit", "Edit", new {customerId=item.CustomerId, eventId = item.EventId}) |
+                @Html.ActionLink("Details", "Details", new {customerId=item.CustomerId, eventId = item.EventId}) |
+                @Html.ActionLink("Delete", "Delete", new {customerId=item.CustomerId, eventId = item.EventId})
             </td>
         </tr>
 }
