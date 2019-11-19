@@ -1,4 +1,4 @@
-﻿@model ThAmCo.Events.Data.Customer
+﻿@model ThAmCo.Events.Models.CustomerBookingsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -7,9 +7,15 @@
 <h2>Details</h2>
 
 <div>
-    <h4>Customer</h4>
+    <h4>CustomerBookingsViewModel</h4>
     <hr />
     <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Id)
+        </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Surname)
         </dt>
@@ -30,7 +36,10 @@
         </dd>
     </dl>
 </div>
+
+<partial name="_GuestBookings" for="Bookings" />
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    @Html.ActionLink("Edit", "Edit", new {  id = Model.Id }) |
     <a asp-action="Index">Back to List</a>
 </div>
