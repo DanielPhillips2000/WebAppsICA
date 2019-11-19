@@ -149,7 +149,7 @@ namespace ThAmCo.Events.Controllers
         // GET: GuestBookings/Delete/5
         public async Task<IActionResult> Delete(int? customerId, int? eventId)
         {
-            if (customerId == null, eventId == null)
+            if (customerId == null || eventId == null)
             {
                 return NotFound();
             }
