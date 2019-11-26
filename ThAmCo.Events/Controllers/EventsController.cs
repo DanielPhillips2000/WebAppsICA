@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Events.Data;
-using System.Net.Http;
+using ThAmCo.Events.Services;
 
 namespace ThAmCo.Events.Controllers
 {
@@ -25,9 +27,32 @@ namespace ThAmCo.Events.Controllers
             return View(await _context.Events.ToListAsync());
         }
 
+
         // GET: Events/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            ReservationGetDto reservation = null;
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new System.Uri("http://localhost:22263");
+            client.DefaultRequestHeaders.Accept.ParseAdd("ReservationGetDto");
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync("/api/reservation/" + id);
+                if (response.IsSuccessStatusCode)
+                {
+                    reservation = await response.Content.ReadAsAsync<ReservationGetDto>();
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            catch
+            {
+                Debug.WriteLine("Details received a bad response from the web service.");
+            }
+
+
             if (id == null)
             {
                 return NotFound();
@@ -41,6 +66,50 @@ namespace ThAmCo.Events.Controllers
             }
 
             return View(@event);
+        }
+
+        // GET: Events/Details/5
+        public async Task<IActionResult> GetVenues(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var @event = await _context.Events
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (@event == null)
+            {
+                return NotFound();
+            }
+
+            IEnumerable<ReservationGetDto> reservation = null;
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new System.Uri("http://localhost:22263");
+            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+            try
+            {
+                // api/Availability?eventType=X?beginDate=X&endDate=X
+                string uri = "/api/Availability/?eventType=" + @event.TypeId + "&beginDate=" +  + "&endDate=" + ;
+
+                HttpResponseMessage response = await client.GetAsync("/api/Availability/?" + id);
+                if (response.IsSuccessStatusCode)
+                {
+                    reservation = await response.Content.ReadAsAsync<IEnumerable<ReservationGetDto>>();
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            catch
+            {
+                Debug.WriteLine("Details received a bad response from the web service.");
+            }
+
+
+            return View(@event);
+
         }
 
         // GET: Events/Create
