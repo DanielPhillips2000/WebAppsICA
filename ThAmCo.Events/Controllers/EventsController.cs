@@ -90,7 +90,7 @@ namespace ThAmCo.Events.Controllers
             try
             {
                 // api/Availability?eventType=X?beginDate=X&endDate=X
-                string uri = "/api/Availability/?eventType=" + @event.TypeId + "&beginDate=" +  + "&endDate=" + ;
+                string uri = "/api/Availability/?eventType=" + @event.TypeId + "&beginDate=" + @event.Date.ToString("yyyy-MM-dd") + "&endDate=" + @event.Date.ToString("yyyy-MM-dd");
 
                 HttpResponseMessage response = await client.GetAsync("/api/Availability/?" + id);
                 if (response.IsSuccessStatusCode)
