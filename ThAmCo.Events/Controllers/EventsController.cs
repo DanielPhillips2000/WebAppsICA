@@ -33,8 +33,8 @@ namespace ThAmCo.Events.Controllers
         {
             ReservationGetDto reservation = null;
             HttpClient client = new HttpClient();
-            client.BaseAddress = new System.Uri("http://localhost:22263");
-            client.DefaultRequestHeaders.Accept.ParseAdd("ReservationGetDto");
+            client.BaseAddress = new System.Uri("http://localhost:2");
+            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             try
             {
                 HttpResponseMessage response = await client.GetAsync("/api/reservation/" + id);
@@ -85,14 +85,14 @@ namespace ThAmCo.Events.Controllers
 
             IEnumerable<ReservationGetDto> reservation = null;
             HttpClient client = new HttpClient();
-            client.BaseAddress = new System.Uri("http://localhost:22263");
+            client.BaseAddress = new System.Uri("http://localhost:23652");
             client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             try
             {
                 // api/Availability?eventType=X?beginDate=X&endDate=X
                 string uri = "/api/Availability/?eventType=" + @event.TypeId + "&beginDate=" + @event.Date.ToString("yyyy-MM-dd") + "&endDate=" + @event.Date.ToString("yyyy-MM-dd");
 
-                HttpResponseMessage response = await client.GetAsync("/api/Availability/?" + id);
+                HttpResponseMessage response = await client.GetAsync(uri);
                 if (response.IsSuccessStatusCode)
                 {
                     reservation = await response.Content.ReadAsAsync<IEnumerable<ReservationGetDto>>();
