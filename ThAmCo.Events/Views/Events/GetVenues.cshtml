@@ -1,4 +1,4 @@
-﻿@model ThAmCo.Events.Data.Event
+﻿@model ThAmCo.Events.Models.VenuesGetViewModel
 
 @{
     ViewData["Title"] = "GetVenues";
@@ -36,6 +36,9 @@
         </dd>
     </dl>
 </div>
+
+<partial name="_AvailableVenues" for="Venues" />
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

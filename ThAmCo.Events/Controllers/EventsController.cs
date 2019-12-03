@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ThAmCo.Events.Data;
+using ThAmCo.Events.Models;
 using ThAmCo.Events.Services;
 
 namespace ThAmCo.Events.Controllers
@@ -83,7 +84,7 @@ namespace ThAmCo.Events.Controllers
                 return NotFound();
             }
 
-            IEnumerable<ReservationGetDto> reservation = null;
+            IEnumerable<AvailabilityGetDto> reservation = new List<AvailabilityGetDto>();
             HttpClient client = new HttpClient();
             client.BaseAddress = new System.Uri("http://localhost:23652");
             client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
@@ -95,7 +96,7 @@ namespace ThAmCo.Events.Controllers
                 HttpResponseMessage response = await client.GetAsync(uri);
                 if (response.IsSuccessStatusCode)
                 {
-                    reservation = await response.Content.ReadAsAsync<IEnumerable<ReservationGetDto>>();
+                    reservation = await response.Content.ReadAsAsync<IEnumerable<AvailabilityGetDto>>();
                 }
                 else
                 {
@@ -107,8 +108,16 @@ namespace ThAmCo.Events.Controllers
                 Debug.WriteLine("Details received a bad response from the web service.");
             }
 
-
-            return View(@event);
+            var eventVenues = new VenuesGetViewModel() {
+                Id = @event.Id,
+                Date = @event.Date,
+                Duration = @event.Duration,
+                Title = @event.Title,
+                TypeId = @event.TypeId,
+                Venues = reservation
+            };
+            
+            return View(eventVenues);
 
         }
 
