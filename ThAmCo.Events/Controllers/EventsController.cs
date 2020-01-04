@@ -69,7 +69,7 @@ namespace ThAmCo.Events.Controllers
             return View(@event);
         }
 
-        // GET: Events/Details/5
+        // GET: Events/GetVenues/5
         public async Task<IActionResult> GetVenues(int? id)
         {
             if (id == null)
@@ -79,10 +79,12 @@ namespace ThAmCo.Events.Controllers
 
             var @event = await _context.Events
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (@event == null)
             {
                 return NotFound();
             }
+
 
             IEnumerable<AvailabilityGetDto> reservation = new List<AvailabilityGetDto>();
             HttpClient client = new HttpClient();
@@ -91,7 +93,7 @@ namespace ThAmCo.Events.Controllers
             try
             {
                 // api/Availability?eventType=X?beginDate=X&endDate=X
-                string uri = "/api/Availability/?eventType=" + @event.TypeId + "&beginDate=" + @event.Date.ToString("yyyy-MM-dd") + "&endDate=" + @event.Date.ToString("yyyy-MM-dd");
+                var uri = @"/api/Availability/?eventType=" + @event.TypeId + "&beginDate=" + @event.Date.ToString("yyyy-MM-dd") + "&endDate=" + @event.Date.AddDays(1).ToString("yyyy-MM-dd");
 
                 HttpResponseMessage response = await client.GetAsync(uri);
                 if (response.IsSuccessStatusCode)
@@ -121,6 +123,89 @@ namespace ThAmCo.Events.Controllers
 
         }
 
+        // POST: Events/GetVenues/5
+        [HttpPost, ActionName("GetVenues")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GetVenues(int? id, string Reserved)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var @event = await _context.Events
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (@event == null)
+            {
+                return NotFound();
+            }
+
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new System.Uri("http://localhost:23652");
+            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+
+            var uri = "/api/reservations/";
+          
+            if (@event.Reference == null)
+            {
+
+                var reservedPost = new ReservationPostDto
+                {
+                    EventDate = @event.Date,
+                    VenueCode = Reserved,
+                    StaffId = "NULL"
+                };
+                if (reservedPost.VenueCode == null||reservedPost.StaffId == null)
+                {
+                    return RedirectToAction("GetVenues", new { id });
+                }
+
+                HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
+                if (response.IsSuccessStatusCode)
+                {
+                    @event.Reference = $"{Reserved}{@event.Date:yyyyMMdd}";
+
+                    _context.Update(@event);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    throw new Exception();
+                } 
+            }
+            else
+            {
+                if (@event.Reference != $"{Reserved}{@event.Date:yyyyMMdd}")
+                {
+                    var reservedPost = new ReservationPostDto
+                    {
+                        EventDate = @event.Date,
+                        VenueCode = Reserved,
+                        StaffId = ""
+                    };
+
+                    HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        @event.Reference = $"{Reserved}{@event.Date:yyyyMMdd}";
+
+                        _context.Update(@event);
+                        await _context.SaveChangesAsync();
+                        RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+            }
+
+
+            return RedirectToAction("GetVenues", new {id});
+        }
         // GET: Events/Create
         public IActionResult Create()
         {
@@ -134,6 +219,7 @@ namespace ThAmCo.Events.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Date,Duration,TypeId")] Event @event)
         {
+            
             if (ModelState.IsValid)
             {
                 _context.Add(@event);

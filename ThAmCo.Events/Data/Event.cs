@@ -20,5 +20,7 @@ namespace ThAmCo.Events.Data
         public string TypeId { get; set; }
 
         public List<GuestBooking> Bookings { get; set; }
+
+        public string Reference { get; set; }
     }
 }

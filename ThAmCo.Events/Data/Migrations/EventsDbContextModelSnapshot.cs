@@ -64,6 +64,8 @@ namespace ThAmCo.Events.Data.Migrations
                         .IsFixedLength(true)
                         .HasMaxLength(3);
 
+                    b.Property<string>("Reference");
+
                     b.HasKey("Id");
 
                     b.ToTable("Events");

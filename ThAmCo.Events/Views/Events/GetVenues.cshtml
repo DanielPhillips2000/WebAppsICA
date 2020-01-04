@@ -39,6 +39,12 @@
 
 <partial name="_AvailableVenues" for="Venues" />
 
+<div class="form-group">
+    <form asp-action="GetVenues" asp-route-Reserved="Reserved">
+        <input type="submit" value="GetVenues" class="btn btn-default" />
+    </form>
+</div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

@@ -21,7 +21,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.CostPerHour)
             </th>
-            <th></th>
+            <th>
+                @Html.Label("Reserve")
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -46,9 +48,9 @@
                 @Html.DisplayFor(modelItem => item.CostPerHour)
             </td>
             <td>
-                @Html.CheckBox("Details", false, new { /* id=item.PrimaryKey */ })
+                <input type="radio" name="Reserved" value="item.code" />
             </td>
-        </tr>
+        </tr>      
 }
     </tbody>
 </table>
