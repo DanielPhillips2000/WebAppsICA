@@ -126,7 +126,7 @@ namespace ThAmCo.Events.Controllers
         // POST: Events/GetVenues/5
         [HttpPost, ActionName("GetVenues")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GetVenues(int? id, string Reserved)
+        public async Task<IActionResult> GetVenues(int? id, string yh)
         {
 
             if (id == null)
@@ -154,7 +154,7 @@ namespace ThAmCo.Events.Controllers
                 var reservedPost = new ReservationPostDto
                 {
                     EventDate = @event.Date,
-                    VenueCode = Reserved,
+                    VenueCode = yh,
                     StaffId = "NULL"
                 };
                 if (reservedPost.VenueCode == null||reservedPost.StaffId == null)
@@ -165,7 +165,7 @@ namespace ThAmCo.Events.Controllers
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
                 if (response.IsSuccessStatusCode)
                 {
-                    @event.Reference = $"{Reserved}{@event.Date:yyyyMMdd}";
+                    @event.Reference = $"{yh}{@event.Date:yyyyMMdd}";
 
                     _context.Update(@event);
                     await _context.SaveChangesAsync();
@@ -178,19 +178,19 @@ namespace ThAmCo.Events.Controllers
             }
             else
             {
-                if (@event.Reference != $"{Reserved}{@event.Date:yyyyMMdd}")
+                if (@event.Reference != $"{yh}{@event.Date:yyyyMMdd}")
                 {
                     var reservedPost = new ReservationPostDto
                     {
                         EventDate = @event.Date,
-                        VenueCode = Reserved,
-                        StaffId = ""
+                        VenueCode = yh,
+                        StaffId = "NULL"
                     };
 
                     HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
                     if (response.IsSuccessStatusCode)
                     {
-                        @event.Reference = $"{Reserved}{@event.Date:yyyyMMdd}";
+                        @event.Reference = $"{yh}{@event.Date:yyyyMMdd}";
 
                         _context.Update(@event);
                         await _context.SaveChangesAsync();

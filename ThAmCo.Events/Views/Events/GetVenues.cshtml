@@ -34,13 +34,17 @@
         <dd>
             @Html.DisplayFor(model => model.TypeId)
         </dd>
+        <dd>
+            <input type="radio" name="yh" value="FDLCK" />
+        </dd>
+        <partial name="_AvailableVenues" for="Venues" />
     </dl>
 </div>
 
-<partial name="_AvailableVenues" for="Venues" />
+
 
 <div class="form-group">
-    <form asp-action="GetVenues" asp-route-Reserved="Reserved">
+    <form asp-action="GetVenues">
         <input type="submit" value="GetVenues" class="btn btn-default" />
     </form>
 </div>
