@@ -30,30 +30,8 @@ namespace ThAmCo.Events.Controllers
 
 
         // GET: Events/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> EventDetails(int? id)
         {
-            ReservationGetDto reservation = null;
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new System.Uri("http://localhost:2");
-            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
-            try
-            {
-                HttpResponseMessage response = await client.GetAsync("/api/reservation/" + id);
-                if (response.IsSuccessStatusCode)
-                {
-                    reservation = await response.Content.ReadAsAsync<ReservationGetDto>();
-                }
-                else
-                {
-                    throw new Exception();
-                }
-            }
-            catch
-            {
-                Debug.WriteLine("Details received a bad response from the web service.");
-            }
-
-
             if (id == null)
             {
                 return NotFound();
@@ -61,12 +39,54 @@ namespace ThAmCo.Events.Controllers
 
             var @event = await _context.Events
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (@event == null)
             {
                 return NotFound();
             }
 
-            return View(@event);
+            IEnumerable<GuestBooking> Bookings = new List<GuestBooking>();
+
+            var eventsDBContext = _context.Guests
+                .Include(g => g.Customer)
+                .AsQueryable()
+                .Include(g => g.Event)
+                .AsQueryable();
+
+            eventsDBContext = eventsDBContext
+                .Where(e => e.EventId == id.Value);
+
+            Bookings = await eventsDBContext.ToListAsync();
+
+            if (@event.Reference == null)
+            {
+                @event.Reference = "Null";
+
+                var eventDetails = new EventVenueGuestViewModel()
+                {
+                    EventId = @event.Id,
+                    Title = @event.Title,
+                    Date = @event.Date,
+                    Duration = @event.Duration,
+                    TypeId = @event.TypeId,
+                    Bookings = Bookings,
+                    Reference = @event.Reference
+                };
+                return View(eventDetails);
+            }
+
+            var EventDetails = new EventVenueGuestViewModel()
+            {
+                EventId = @event.Id,
+                Title = @event.Title,
+                Date = @event.Date,
+                Duration = @event.Duration,
+                TypeId = @event.TypeId,
+                Bookings = Bookings,
+                Reference = @event.Reference
+            };
+
+            return View(EventDetails);
         }
 
         // GET: Events/GetVenues/5
@@ -126,7 +146,7 @@ namespace ThAmCo.Events.Controllers
         // POST: Events/GetVenues/5
         [HttpPost, ActionName("GetVenues")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GetVenues(int? id, string yh)
+        public async Task<IActionResult> GetVenues(int? id, string reserved)
         {
 
             if (id == null)
@@ -154,7 +174,7 @@ namespace ThAmCo.Events.Controllers
                 var reservedPost = new ReservationPostDto
                 {
                     EventDate = @event.Date,
-                    VenueCode = yh,
+                    VenueCode = "FDLCK",
                     StaffId = "NULL"
                 };
                 if (reservedPost.VenueCode == null||reservedPost.StaffId == null)
@@ -165,10 +185,11 @@ namespace ThAmCo.Events.Controllers
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
                 if (response.IsSuccessStatusCode)
                 {
-                    @event.Reference = $"{yh}{@event.Date:yyyyMMdd}";
+                    @event.Reference = $"{"FDLCK"}{@event.Date:yyyyMMdd}";
 
                     _context.Update(@event);
                     await _context.SaveChangesAsync();
+
                     return RedirectToAction(nameof(Index));
                 }
                 else
@@ -178,19 +199,19 @@ namespace ThAmCo.Events.Controllers
             }
             else
             {
-                if (@event.Reference != $"{yh}{@event.Date:yyyyMMdd}")
+                if (@event.Reference != $"{@reserved}{@event.Date:yyyyMMdd}")
                 {
                     var reservedPost = new ReservationPostDto
                     {
                         EventDate = @event.Date,
-                        VenueCode = yh,
+                        VenueCode = @reserved,
                         StaffId = "NULL"
                     };
 
                     HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
                     if (response.IsSuccessStatusCode)
                     {
-                        @event.Reference = $"{yh}{@event.Date:yyyyMMdd}";
+                        @event.Reference = $"{@reserved}{@event.Date:yyyyMMdd}";
 
                         _context.Update(@event);
                         await _context.SaveChangesAsync();

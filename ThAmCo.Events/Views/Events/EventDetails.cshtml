@@ -1,13 +1,13 @@
-﻿@model ThAmCo.Events.Models.VenuesGetViewModel
+﻿@model ThAmCo.Events.Models.EventVenueGuestViewModel
 
 @{
-    ViewData["Title"] = "GetVenues";
+    ViewData["Title"] = "EventDetails";
 }
 
-<h2>GetVenues</h2>
+<h2>EventDetails</h2>
 
 <div>
-    <h4>Event</h4>
+    <h4>EventVenueGuest</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -34,18 +34,16 @@
         <dd>
             @Html.DisplayFor(model => model.TypeId)
         </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Reference)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Reference)
+        </dd>
+        <partial name="_GuestBooked" for="Bookings"/>
     </dl>
-    <partial name="_AvailableVenues" model=@Model.Venues />
 </div>
-
-<form asp-action="GetVenues">
-    <div class="form-group">
-        <input type="submit" value="GetVenues" class="btn btn-default" />
-    </div>
-</form>
-
-
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
