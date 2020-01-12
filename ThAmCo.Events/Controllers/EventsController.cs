@@ -62,7 +62,7 @@ namespace ThAmCo.Events.Controllers
             {
                 @event.Reference = "Null";
 
-                var eventDetails = new EventVenueGuestViewModel()
+                var eventDetailsWithoutVenue  = new EventVenueGuestViewModel()
                 {
                     EventId = @event.Id,
                     Title = @event.Title,
@@ -72,7 +72,7 @@ namespace ThAmCo.Events.Controllers
                     Bookings = Bookings,
                     Reference = @event.Reference
                 };
-                return View(eventDetails);
+                return View(eventDetailsWithoutVenue);
             }
 
             var EventDetails = new EventVenueGuestViewModel()
@@ -88,6 +88,8 @@ namespace ThAmCo.Events.Controllers
 
             return View(EventDetails);
         }
+
+
 
         // GET: Events/GetVenues/5
         public async Task<IActionResult> GetVenues(int? id)
@@ -143,10 +145,11 @@ namespace ThAmCo.Events.Controllers
 
         }
 
+
         // POST: Events/GetVenues/5
         [HttpPost, ActionName("GetVenues")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GetVenues(int? id, string reserved)
+        public async Task<IActionResult> GetVenues(int? id, string toReserve)
         {
 
             if (id == null)
@@ -162,19 +165,24 @@ namespace ThAmCo.Events.Controllers
                 return NotFound();
             }
 
+            if (toReserve == null)
+            {
+                return RedirectToAction("GetVenues", new { id });
+            }
+
             HttpClient client = new HttpClient();
             client.BaseAddress = new System.Uri("http://localhost:23652");
             client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
 
             var uri = "/api/reservations/";
-          
+
             if (@event.Reference == null)
             {
 
                 var reservedPost = new ReservationPostDto
                 {
                     EventDate = @event.Date,
-                    VenueCode = "FDLCK",
+                    VenueCode = toReserve,
                     StaffId = "NULL"
                 };
                 if (reservedPost.VenueCode == null||reservedPost.StaffId == null)
@@ -185,7 +193,7 @@ namespace ThAmCo.Events.Controllers
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
                 if (response.IsSuccessStatusCode)
                 {
-                    @event.Reference = $"{"FDLCK"}{@event.Date:yyyyMMdd}";
+                    @event.Reference = $"{toReserve}{@event.Date:yyyyMMdd}";
 
                     _context.Update(@event);
                     await _context.SaveChangesAsync();
@@ -199,32 +207,36 @@ namespace ThAmCo.Events.Controllers
             }
             else
             {
-                if (@event.Reference != $"{@reserved}{@event.Date:yyyyMMdd}")
+                if (@event.Reference != $"{toReserve}{@event.Date:yyyyMMdd}")
                 {
-                    var reservedPost = new ReservationPostDto
-                    {
-                        EventDate = @event.Date,
-                        VenueCode = @reserved,
-                        StaffId = "NULL"
-                    };
+                    var referenceDelete = @event.Reference;
 
-                    HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
-                    if (response.IsSuccessStatusCode)
+                    HttpResponseMessage responseDelete = await client.DeleteAsync(uri + referenceDelete);
+                    if (responseDelete.IsSuccessStatusCode)
                     {
-                        @event.Reference = $"{@reserved}{@event.Date:yyyyMMdd}";
+                        var reservedPost = new ReservationPostDto
+                        {
+                            EventDate = @event.Date,
+                            VenueCode = toReserve,
+                            StaffId = "NULL"
+                        };
 
-                        _context.Update(@event);
-                        await _context.SaveChangesAsync();
-                        RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        throw new Exception();
+                        HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            @event.Reference = $"{toReserve}{@event.Date:yyyyMMdd}";
+
+                            _context.Update(@event);
+                            await _context.SaveChangesAsync();
+                            RedirectToAction(nameof(Index));
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
                     }
                 }
             }
-
-
             return RedirectToAction("GetVenues", new {id});
         }
         // GET: Events/Create
@@ -271,7 +283,7 @@ namespace ThAmCo.Events.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Date,Duration,TypeId")] Event @event)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Duration")] EventEditViewModel @event)
         {
             if (id != @event.Id)
             {
@@ -282,7 +294,10 @@ namespace ThAmCo.Events.Controllers
             {
                 try
                 {
-                    _context.Update(@event);
+                    var editEvent = await _context.Events.FindAsync(id);
+                    editEvent.Title = @event.Title;
+                    editEvent.Duration = @event.Duration;
+                    _context.Update(editEvent);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

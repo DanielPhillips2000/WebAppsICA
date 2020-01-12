@@ -13,6 +13,10 @@ namespace ThAmCo.Events.Models
         [Required]
         public string Title { get; set; }
 
+        public DateTime Date { get; set; }
+
         public TimeSpan? Duration { get; set; }
+
+        public string TypeId { get; set; }
     }
 }

@@ -24,6 +24,9 @@ namespace ThAmCo.Events.Models
 
         public IEnumerable<GuestBooking> Bookings { get; set; }
 
+        public int BookingsCount { get; set; }
+
         public string Reference { get; set; }
+
     }
 }

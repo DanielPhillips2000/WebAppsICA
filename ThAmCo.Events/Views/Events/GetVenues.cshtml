@@ -38,8 +38,9 @@
     <partial name="_AvailableVenues" model=@Model.Venues />
 </div>
 
-<form asp-action="GetVenues">
+<form asp-action="GetVenues" id="venueForm">
     <div class="form-group">
+        <input type="hidden" id="toReserve" name="toReserve" value="FDLCK" />
         <input type="submit" value="GetVenues" class="btn btn-default" />
     </div>
 </form>
@@ -49,3 +50,16 @@
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+@section Scripts {
+@{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+<script type="text/javascript">
+    $(document).ready(function(){
+    $('#venueForm').submit(function(e){
+    var ven = $('input[name="reserved"]:checked').val();
+    $('#toReserve').val(ven);
+    });
+    });
+</script>
+}
