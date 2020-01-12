@@ -89,7 +89,15 @@ namespace ThAmCo.Events.Controllers
             return View(EventDetails);
         }
 
+        public async Task<IActionResult> EventListWithDetails()
+        {
+            var @events = await _context.Events
+                .Include(b => b.Bookings)
+                .ThenInclude(c => c.Customer)
+                .ToListAsync();
 
+            return View(@events);
+        }
 
         // GET: Events/GetVenues/5
         public async Task<IActionResult> GetVenues(int? id)
@@ -340,9 +348,35 @@ namespace ThAmCo.Events.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var @event = await _context.Events.FindAsync(id);
-            _context.Events.Remove(@event);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            if (@event.Reference == null)
+            {
+                _context.Events.Remove(@event);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new System.Uri("http://localhost:23652");
+                client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+
+                var uri = "/api/reservations/";
+                var referenceDelete = @event.Reference;
+
+                HttpResponseMessage responseDelete = await client.DeleteAsync(uri + referenceDelete);
+                if (responseDelete.IsSuccessStatusCode)
+                {
+
+                    _context.Events.Remove(@event);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }  
         }
 
         private bool EventExists(int id)

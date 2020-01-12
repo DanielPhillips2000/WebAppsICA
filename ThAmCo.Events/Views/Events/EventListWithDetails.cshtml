@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ThAmCo.Events.Models.EventVenueGuestViewModel>
+﻿@model IEnumerable<ThAmCo.Events.Data.Event>
 
 @{
     ViewData["Title"] = "EventListWithDetails";
@@ -13,7 +13,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.EventId)
+                @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Title)
@@ -40,7 +40,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.EventId)
+                @Html.DisplayFor(modelItem => item.Id)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
@@ -58,12 +58,10 @@
                 @Html.DisplayFor(modelItem => item.Reference)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.BookingsCount)
-            </td>
-            <td>
+                @item.Bookings.Count()
             </td>
         </tr>
-}
+} 
     </tbody>
 </table>
 <div>
