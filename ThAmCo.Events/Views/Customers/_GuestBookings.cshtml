@@ -28,9 +28,8 @@
                 @Html.DisplayFor(modelItem => item.Attended)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                <a asp-controller="Events" asp-action="Edit" asp-route-id="@item.EventId">Edit</a> |
+                <a asp-controller="Events" asp-action="EventDetails" asp-route-id="@item.EventId">Details</a> 
             </td>
         </tr>
 }

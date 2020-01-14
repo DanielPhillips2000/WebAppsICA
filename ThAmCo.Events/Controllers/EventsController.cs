@@ -60,7 +60,7 @@ namespace ThAmCo.Events.Controllers
 
             if (@event.Reference == null)
             {
-                @event.Reference = "Null";
+                @event.Reference = "No Venue has been reserved yet";
 
                 var eventDetailsWithoutVenue  = new EventVenueGuestViewModel()
                 {
@@ -90,7 +90,7 @@ namespace ThAmCo.Events.Controllers
         }
 
         public async Task<IActionResult> EventListWithDetails()
-        {
+         {
             var @events = await _context.Events
                 .Include(b => b.Bookings)
                 .ThenInclude(c => c.Customer)
@@ -195,7 +195,7 @@ namespace ThAmCo.Events.Controllers
                 };
                 if (reservedPost.VenueCode == null||reservedPost.StaffId == null)
                 {
-                    return RedirectToAction("GetVenues", new { id });
+                    return RedirectToAction(nameof(Index));
                 }
 
                 HttpResponseMessage response = await client.PostAsJsonAsync(uri, reservedPost);
@@ -245,7 +245,7 @@ namespace ThAmCo.Events.Controllers
                     }
                 }
             }
-            return RedirectToAction("GetVenues", new {id});
+            return RedirectToAction(nameof(Index));
         }
         // GET: Events/Create
         public IActionResult Create()
@@ -290,7 +290,7 @@ namespace ThAmCo.Events.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] 
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Duration")] EventEditViewModel @event)
         {
             if (id != @event.Id)

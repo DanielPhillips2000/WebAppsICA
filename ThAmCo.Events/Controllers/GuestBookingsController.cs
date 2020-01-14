@@ -114,9 +114,9 @@ namespace ThAmCo.Events.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CustomerId,EventId,Attended")] GuestBooking guestBooking)
+        public async Task<IActionResult> Edit(int CustomerId, int EventId, [Bind("CustomerId,EventId,Attended")] GuestBooking guestBooking)
         {
-            if (id != guestBooking.CustomerId)
+            if (CustomerId != guestBooking.CustomerId || EventId != guestBooking.EventId)
             {
                 return NotFound();
             }
